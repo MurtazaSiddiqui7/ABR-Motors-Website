@@ -1,17 +1,15 @@
-HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="0VBsh94OPbU80LjfGO4C552L0Rsug2-xOmhz_C7TeAI" />
     <title>ABR MOTORS - Where Passion Meets Precision</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">  <!-- For logo icon -->
     <style>
         body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #000; color: #fff; overflow-x: hidden; }
         header { background-color: #000; padding: 20px; text-align: center; border-bottom: 2px solid #ff0000; }
         .logo { font-size: 2.5em; font-weight: bold; color: #ff0000; text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.5); }
-        .logo i { margin-right: 10px; }  /* Space for icon */
+        .logo img { height: 60px; vertical-align: middle; margin-right: 10px; }  /* Ensure logo displays properly */
         .hero { position: relative; height: 80vh; overflow: hidden; }
         .carousel { display: flex; width: 400%; animation: slide 20s infinite; }
         .slide { width: 100%; height: 80vh; background-size: cover; background-position: center; }
@@ -51,10 +49,9 @@ HTML_TEMPLATE = """
 <body>
     <header>
         <div class="logo">
-  <img src="abr_logo.jpeg" alt="ABR Motors Logo" style="height:60px; vertical-align:middle; margin-right:10px;">
-  ABR MOTORS
-</div>
-
+            <img src="static/abr_logo.jpeg" alt="ABR Motors Logo" style="height:60px; vertical-align:middle; margin-right:10px;">
+            ABR MOTORS
+        </div>
         <p>All Kinds of two wheeler Repairs</p>
         <p>Multi Brand Service Centre</p>
     </header>
@@ -75,14 +72,14 @@ HTML_TEMPLATE = """
             <p>Quick Service</p>
             <p>Breakdown</p>
             <p>Emergency Repair</p>
-            <a href="tel:+918978057984" class="btn" onclick="logClick('call_now')">CALL NOW</a>
+            <a href="tel:+918978057984" class="btn">CALL NOW</a>
         </div>
     </section>
 
     <section class="about">
         <h2>Full Service & Repairing</h2>
         <p>Expert Two-Wheeler Services</p>
-        <a href="#booking" class="btn" onclick="logClick('book_now')">BOOK NOW</a>
+        <a href="#booking" class="btn">BOOK NOW</a>
     </section>
 
     <section id="booking" class="booking">
@@ -101,7 +98,7 @@ HTML_TEMPLATE = """
                     <option value="Other">Other</option>
                 </select>
                 <textarea id="message" name="message" placeholder="Any special requests?"></textarea>
-                <button type="submit" onclick="logClick('book_now')">Book Now</button>
+                <button type="submit">Book Now</button>
             </form>
         </div>
         <p><strong>Booking Options:</strong> Call +91 89780 57984, email [your-email@example.com], or visit us. We confirm quickly.</p>
@@ -144,8 +141,8 @@ HTML_TEMPLATE = """
             <p><strong>Mobile:</strong> +91 89780 57984</p>
             <p><strong>Garage:</strong> ABR MOTORS</p>
             <p><strong>Google Maps:</strong> <a href="https://maps.app.goo.gl/YXjD9trYDAFH84HRA?g_st=aw" target="_blank">View Location</a></p>
-            <a href="https://wa.me/918978057984" class="whatsapp-btn" onclick="logClick('whatsapp_visit')">WhatsApp Visit</a>
-            <a href="https://www.instagram.com/abrmotors16?utm_source=qr&igsh=b2ViejdtbnAycDB2" target="_blank" class="instagram" onclick="logClick('instagram_profile')"><i class="fab fa-instagram"></i>Instagram Profile</a>
+            <a href="https://wa.me/918978057984" class="whatsapp-btn">WhatsApp Visit</a>
+            <a href="https://www.instagram.com/abrmotors16?utm_source=qr&igsh=b2ViejdtbnAycDB2" target="_blank" class="instagram"><i class="fab fa-instagram"></i>Instagram Profile</a>
             <p>Call or visit us for the best two-wheeler services!</p>
         </div>
     </section>
@@ -204,66 +201,36 @@ HTML_TEMPLATE = """
             counterElement.textContent = Math.floor(counter) + '+ Satisfied Customers';
         }, 50);
 
-        // Form submission to backend
+        // Form submission: Redirect to WhatsApp with auto-filled message
         const form = document.getElementById('bookingForm');
-        form.addEventListener('submit', async function(event) {
+        form.addEventListener('submit', function(event) {
             event.preventDefault();
-            
-            const formData = new FormData(form);
-            const data = {
-                name: formData.get('name'),
-                phone: formData.get('phone'),
-                email: formData.get('email') || '',
-                service: formData.get('service'),
-                message: formData.get('message') || ''
-            };
 
-            if (!data.name || !data.phone || !data.service) {
-                alert('Please fill in all required fields.');
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const service = document.getElementById('service').value;
+            const message = document.getElementById('message').value.trim();
+
+            // Validation
+            if (!name || !phone || !service) {
+                alert('Please fill in all required fields (Name, Phone, Service).');
                 return;
             }
-            if (!/^\d{10}$/.test(data.phone.replace(/\D/g, ''))) {
+            if (!/^\d{10}$/.test(phone.replace(/\D/g, ''))) {
                 alert('Please enter a valid 10-digit phone number.');
                 return;
             }
 
-            try {
-                const response = await fetch('/book', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+            // Build WhatsApp URL with auto-filled message
+            const whatsappMessage = `Hello Ahmad, I have booked a service for ${service}. Name: ${name}, Phone: ${phone}${email ? `, Email: ${email}` : ''}${message ? `, Message: ${message}` : ''}`;
+            const whatsappUrl = `https://wa.me/918978057984?text=${encodeURIComponent(whatsappMessage)}`;
 
-                const result = await response.json();
-                if (response.ok) {
-                    alert('Booking completed! Ahmad will contact you soon.');
-                    // Redirect to WhatsApp
-                    const whatsappUrl = `https://wa.me/918978057984?text=Hello%20Ahmad,%20I%20have%20booked%20a%20service%20for%20${data.service}.%20Name:%20${data.name},%20Phone:%20${data.phone},%20Message:%20${data.message}`;
-                    window.location.href = whatsappUrl;  // Redirect to WhatsApp
-                    form.reset();
-                } else {
-                    alert('Error: ' + result.error);
-                }
-            } catch (error) {
-                alert('Connection failed. Please try again or call us.');
-                console.error(error);
-            }
+            // Redirect to WhatsApp
+            window.location.href = whatsappUrl;
         });
 
-        // Log button clicks
-        async function logClick(buttonName) {
-            try {
-                await fetch('/log_click', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ button: buttonName })
-                });
-            } catch (error) {
-                console.error('Logging failed:', error);
-            }
-        }
-
-        // Smooth scroll
+        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -275,6 +242,3 @@ HTML_TEMPLATE = """
     </script>
 </body>
 </html>
-"""
-
-
